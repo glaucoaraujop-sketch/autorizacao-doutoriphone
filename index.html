@@ -6,7 +6,6 @@
 <title>Autorização de Coleta – Dr. iPhone</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -831,21 +830,9 @@
         }))
       });
 
-      // Envia e-mail com dados via EmailJS (sem PDF anexado — PDF vai para o Drive)
-      btn.innerHTML = '<span class="spinner"></span>Enviando e-mail...';
-      const ejsRes = await emailjs.send('service_5xnpqit', 'template_a9avnxa', {
-        protocolo, agora, nome,
-        cpf:        document.getElementById('cpf').value.trim(),
-        rg:         document.getElementById('rg').value.trim(),
-        telefone:   tel,
-        email,
-        endereco:   document.getElementById('endereco').value.trim(),
-        referencia: document.getElementById('referencia').value.trim() || '—',
-        tipo, marca, serial: serial || '—', cond,
-        problema:   prob
-      });
-
-      if (ejsRes.status !== 200) throw new Error('Erro EmailJS');
+      // Aguarda o Google Apps Script processar
+      btn.innerHTML = '<span class="spinner"></span>Registrando...'
+      await new Promise(r => setTimeout(r, 1500));
 
       // Armazena dados globalmente para o PDF
       window._dadosAutorizacao = { protocolo, agora, nome, cpf: document.getElementById('cpf').value.trim(), rg: document.getElementById('rg').value.trim(), tel, email, end: document.getElementById('endereco').value.trim(), ref: document.getElementById('referencia').value.trim(), tipo, marca, serial, cond, prob, sigData };
@@ -986,10 +973,7 @@
 
   updateProgress();
 
-  // Inicializa EmailJS
-  emailjs.init('fHYv2qqablD3HlD7E');
-
-  // Gera PDF em base64 para envio por e-mail
+  // Gera PDF em base64 para salvar no Drive
   function gerarPDFBase64(d) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
