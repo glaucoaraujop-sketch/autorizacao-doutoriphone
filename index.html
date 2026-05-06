@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autorização de Coleta – Dr. iPhone</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0a0a0a;
+    --dark: #141414;
+    --dark2: #1e1e1e;
+    --dark3: #2a2a2a;
+    --gold: #c8a45a;
+    --gold-light: #e0c07a;
+    --cream: #f5f0e8;
+    --white: #ffffff;
+    --text: #e8e4dc;
+    --text-muted: #8a8580;
+    --border: #2e2e2e;
+    --border-gold: rgba(200,164,90,0.3);
+    --error: #e05555;
+    --success: #4a9e6e;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--dark);
+    border-bottom: 1px solid var(--border-gold);
+    padding: 40px 24px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(200,164,90,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .header-brand span { color: var(--white); }
+  .header-doc-type {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .header-rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .rule-line { flex: 1; max-width: 80px; height: 1px; background: var(--border-gold); }
+  .rule-diamond { width: 5px; height: 5px; background: var(--gold); transform: rotate(45deg); }
+
+  /* PROGRESS */
+  .progress-bar { background: var(--dark3); height: 2px; }
+  .progress-fill { height: 100%; background: linear-gradient(to right, var(--gold), var(--gold-light)); width: 0%; transition: width 0.5s ease; }
+
+  /* CONTAINER */
+  .container { max-width: 660px; margin: 0 auto; padding: 36px 20px 80px; }
+
+  /* NOTICE */
+  .notice {
+    background: var(--dark2);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .notice strong { color: var(--gold); display: block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+
+  /* FORM CARD */
+  .form-card {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 40px 36px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+
+  /* STEPS */
+  .step { display: none; }
+  .step.active { display: block; }
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .step-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+
+  /* STEP DOTS */
+  .step-indicator { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 32px; }
+  .step-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dark3); border: 1px solid var(--border); transition: all 0.3s; }
+  .step-dot.active { background: var(--gold); border-color: var(--gold); transform: scale(1.3); }
+  .step-dot.done { background: var(--gold); border-color: var(--gold); opacity: 0.5; }
+
+  /* FIELDS */
+  .field { margin-bottom: 22px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+  .field label .required { color: var(--gold); margin-left: 3px; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 13px 16px;
+    background: var(--dark2); border: 1.5px solid var(--border);
+    border-radius: 5px; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none; appearance: none; -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(200,164,90,0.1);
+    background: var(--dark3);
+  }
+  .field input::placeholder, .field textarea::placeholder { color: var(--dark3); }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8580' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+    color: var(--text);
+  }
+  .field select option { background: var(--dark2); color: var(--text); }
+  .field-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+  .field-error { font-size: 12px; color: var(--error); margin-top: 5px; display: none; }
+  .field.has-error input, .field.has-error select, .field.has-error textarea { border-color: var(--error); }
+  .field.has-error .field-error { display: block; }
+
+  /* TWO COLS */
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+
+  /* SECTION DIVIDER */
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gold);
+    margin: 28px 0 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border-gold); }
+
+  /* TERMOS */
+  .terms-box {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 20px;
+    max-height: 240px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-gold) var(--dark2);
+  }
+  .terms-box::-webkit-scrollbar { width: 4px; }
+  .terms-box::-webkit-scrollbar-track { background: var(--dark2); }
+  .terms-box::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 2px; }
+  .terms-box p { margin-bottom: 12px; }
+  .terms-box p:last-child { margin-bottom: 0; }
+  .terms-box strong { color: var(--text); }
+
+  .checkbox-field {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 16px; background: var(--dark2);
+    border: 1.5px solid var(--border); border-radius: 5px;
+    cursor: pointer; margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .checkbox-field:hover { border-color: var(--gold); }
+  .checkbox-field.checked { border-color: var(--gold); background: rgba(200,164,90,0.06); }
+  .checkbox-field input[type="checkbox"] { display: none; }
+  .checkbox-box {
+    width: 20px; height: 20px; min-width: 20px;
+    border: 1.5px solid var(--border); border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; margin-top: 1px;
+  }
+  .checkbox-field.checked .checkbox-box { background: var(--gold); border-color: var(--gold); }
+  .checkbox-box svg { display: none; }
+  .checkbox-field.checked .checkbox-box svg { display: block; }
+  .checkbox-label { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .checkbox-label strong { color: var(--text); }
+  .checkbox-error { font-size: 12px; color: var(--error); margin-top: -10px; margin-bottom: 14px; display: none; }
+
+  /* ASSINATURA */
+  .canvas-wrap {
+    position: relative;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    background: var(--dark2);
+    margin-bottom: 10px;
+  }
+  .canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: 160px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .canvas-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--dark3);
+    pointer-events: none;
+    transition: opacity 0.3s;
+    font-style: italic;
+  }
+  .canvas-actions { display: flex; justify-content: flex-end; }
+  .btn-clear-sig {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; color: var(--text-muted);
+    background: none; border: none; cursor: pointer;
+    padding: 4px 0; text-decoration: underline;
+    transition: color 0.2s;
+  }
+  .btn-clear-sig:hover { color: var(--gold); }
+  .sig-error { font-size: 12px; color: var(--error); margin-top: 4px; display: none; }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; }
+  .btn {
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    letter-spacing: 0.5px; padding: 13px 30px; border-radius: 5px;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--gold); color: var(--black); }
+  .btn-primary:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(200,164,90,0.3); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+
+  /* SUMMARY */
+  .summary-box {
+    background: var(--dark2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .summary-section { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; gap: 12px; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .key { color: var(--text-muted); white-space: nowrap; }
+  .summary-row .val { font-weight: 500; color: var(--text); text-align: right; }
+  .sig-preview { max-width: 180px; max-height: 60px; border: 1px solid var(--border); border-radius: 3px; }
+
+  /* SUCCESS */
+  .success-screen { text-align: center; padding: 16px 0; }
+  .success-icon { width: 72px; height: 72px; background: rgba(74,158,110,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; border: 1px solid rgba(74,158,110,0.3); }
+  .success-icon svg { width: 32px; height: 32px; }
+  .success-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--white); margin-bottom: 10px; }
+  .success-msg { font-size: 14px; color: var(--text-muted); line-height: 1.7; max-width: 400px; margin: 0 auto 32px; }
+  .success-num {
+    display: inline-block;
+    background: var(--dark2); border: 1px solid var(--border-gold);
+    border-radius: 4px; padding: 8px 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; color: var(--gold); margin-bottom: 28px;
+    letter-spacing: 2px;
+  }
+
+  /* SPINNER */
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--black); border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 480px) {
+    .form-card { padding: 28px 20px; }
+    .btn-row { flex-direction: column-reverse; }
+    .btn { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-doc-type">Documento Oficial</div>
+  <div class="header-brand">Dr. <span>iPhone</span></div>
+  <div style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Autorização de Coleta e Orçamento</div>
+  <div class="header-rule">
+    <div class="rule-line"></div>
+    <div class="rule-diamond"></div>
+    <div class="rule-line"></div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="container">
+
+  <div class="notice">
+    <strong>⚖️ Documento com validade jurídica</strong>
+    Ao preencher e assinar este formulário, o cliente autoriza formalmente a coleta do aparelho e a realização do orçamento pelo serviço Dr. iPhone. Os dados informados têm valor legal e serão armazenados com segurança.
+  </div>
+
+  <div class="form-card">
+
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot0"></div>
+      <div class="step-dot" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
+      <div class="step-dot" id="dot3"></div>
+    </div>
+
+    <!-- ETAPA 1: Dados do cliente -->
+    <div class="step active" id="step0">
+      <div class="step-title">Dados do cliente</div>
+      <div class="step-desc">Informe seus dados pessoais. Eles serão vinculados à autorização.</div>
+
+      <div class="field" id="field-nome">
+        <label>Nome completo <span class="required">*</span></label>
+        <input type="text" id="nome" placeholder="Nome completo" autocomplete="name" />
+        <div class="field-error">Por favor, informe seu nome completo.</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field" id="field-cpf">
+          <label>CPF <span class="required">*</span></label>
+          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)" />
+          <div class="field-error">CPF inválido.</div>
+        </div>
+        <div class="field" id="field-rg">
+          <label>RG <span class="required">*</span></label>
+          <input type="text" id="rg" placeholder="00.000.000-0" />
+          <div class="field-error">Informe o RG.</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field" id="field-telefone">
+          <label>Telefone / WhatsApp <span class="required">*</span></label>
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000" autocomplete="tel" oninput="maskTel(this)" />
+          <div class="field-error">Informe o telefone.</div>
+        </div>
+        <div class="field" id="field-email">
+          <label>E-mail <span class="required">*</span></label>
+          <input type="email" id="email" placeholder="seu@email.com" autocomplete="email" />
+          <div class="field-error">Informe um e-mail válido.</div>
+        </div>
+      </div>
+
+      <div class="field" id="field-endereco">
+        <label>Endereço completo para coleta <span class="required">*</span></label>
+        <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade" autocomplete="street-address" />
+        <div class="field-hint">Informe o endereço onde o aparelho será coletado.</div>
+        <div class="field-error">Por favor, informe o endereço de coleta.</div>
+      </div>
+
+      <div class="field" id="field-referencia">
+        <label>Ponto de referência</label>
+        <input type="text" id="referencia" placeholder="Ex.: próximo ao mercado X, portão azul, 2º andar..." />
+        <div class="field-hint">Opcional, mas facilita a localização no momento da coleta.</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="nextStep(0)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- ETAPA 2: Dados do aparelho -->
+    <div class="step" id="step1">
+      <div class="step-title">Dados do aparelho</div>
+      <div class="step-desc">Descreva o aparelho e o problema apresentado.</div>
+
+      <div class="field-row">
+        <div class="field" id="field-tipo">
+          <label>Tipo de aparelho <span class="required">*</span></label>
+          <select id="tipo">
+            <option value="">Selecione...</option>
+            <option>Celular / Smartphone</option>
+            <option>Notebook</option>
+            <option>Computador / Desktop</option>
+            <option>Tablet</option>
+            <option>Smartwatch</option>
+            <option>Console de videogame</option>
+            <option>Outro eletrônico</option>
+          </select>
+          <div class="field-error">Selecione o tipo de aparelho.</div>
+        </div>
+        <div class="field" id="field-marca">
+          <label>Marca e modelo <span class="required">*</span></label>
+          <input type="text" id="marca" placeholder="Ex.: iPhone 14 Pro" />
+          <div class="field-error">Informe a marca e o modelo.</div>
+        </div>
+      </div>
+
+      <div class="field" id="field-serial">
+        <label>Número de série / IMEI</label>
+        <input type="text" id="serial" placeholder="Opcional, mas recomendado" />
+        <div class="field-hint">Para celulares: disque *#06# para ver o IMEI.</div>
+      </div>
+
+      <div class="field" id="field-problema">
+        <label>Descrição do problema <span class="required">*</span></label>
+        <textarea id="problema" rows="4" placeholder="Descreva o que está acontecendo com o aparelho..." style="resize:vertical"></textarea>
+        <div class="field-error">Descreva o problema do aparelho.</div>
+      </div>
+
+      <div class="field" id="field-condicao">
+        <label>Condição estética do aparelho <span class="required">*</span></label>
+        <select id="condicao">
+          <option value="">Selecione...</option>
+          <option>Ótimo estado (sem arranhões ou danos)</option>
+          <option>Bom estado (arranhões leves)</option>
+          <option>Estado regular (arranhões visíveis ou amassados)</option>
+          <option>Estado ruim (tela trincada ou danos graves)</option>
+        </select>
+        <div class="field-error">Selecione a condição do aparelho.</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep(1)">← Voltar</button>
+        <button class="btn btn-primary" onclick="nextStep(1)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- ETAPA 3: Termos e assinatura -->
+    <div class="step" id="step2">
+      <div class="step-title">Autorização e assinatura</div>
+      <div class="step-desc">Leia os termos abaixo, confirme sua concordância e assine digitalmente.</div>
+
+      <div class="terms-box" id="termsBox">
+        <p><strong>AUTORIZAÇÃO DE COLETA E ORÇAMENTO</strong></p>
+        <p>Eu, o(a) cliente identificado(a) neste formulário, declaro que li e compreendi os termos abaixo e autorizo expressamente o serviço <strong>Dr. iPhone</strong> a:</p>
+        <p><strong>1. COLETA DO APARELHO:</strong> Coletar o aparelho eletrônico descrito neste documento no endereço por mim informado, para fins de diagnóstico e elaboração de orçamento de reparo.</p>
+        <p><strong>2. DIAGNÓSTICO E ORÇAMENTO:</strong> Realizar a análise técnica do aparelho e apresentar um orçamento detalhado para o reparo. Nenhum serviço de reparo será iniciado sem minha aprovação prévia e expressa.</p>
+        <p><strong>3. GUARDA E RESPONSABILIDADE:</strong> O Dr. iPhone compromete-se a guardar o aparelho com o devido cuidado durante o período de diagnóstico. Em caso de recusa do orçamento, o aparelho será devolvido ao cliente no mesmo estado em que foi recebido, sem qualquer custo adicional.</p>
+        <p><strong>4. BACKUP DE DADOS:</strong> <strong>O cliente é o único responsável por realizar o backup de seus dados</strong> (fotos, contatos, aplicativos, mensagens e demais arquivos) antes da entrega do aparelho ao Dr. iPhone. O Dr. iPhone não se responsabiliza por qualquer perda, dano ou exclusão de dados ocorrida durante o processo de diagnóstico ou reparo, ainda que decorrente de procedimentos técnicos necessários. Recomenda-se fortemente que o cliente efetue o backup completo do dispositivo antes da coleta.</p>
+        <p><strong>5. DADOS PESSOAIS:</strong> Os dados informados neste formulário serão utilizados exclusivamente para fins de identificação, contato e registro do serviço solicitado, conforme a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).</p>
+        <p><strong>6. VALIDADE:</strong> Este documento tem validade jurídica e poderá ser utilizado como comprovante da autorização ora concedida, incluindo a assinatura digital aposta pelo cliente.</p>
+        <p>Ao assinar este documento, o cliente confirma que todas as informações prestadas são verdadeiras e que concorda integralmente com os termos acima.</p>
+      </div>
+
+      <label class="checkbox-field" id="chk-termos-wrap" onclick="toggleCheck('chk-termos')">
+        <input type="checkbox" id="chk-termos" />
+        <div class="checkbox-box">
+          <svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="checkbox-label"><strong>Li e concordo com os termos acima</strong> e autorizo a coleta e o orçamento do meu aparelho pelo Dr. iPhone.</span>
+      </label>
+      <div class="checkbox-error" id="chk-termos-error">Por favor, confirme sua concordância com os termos.</div>
+
+      <div class="section-label">Assinatura digital</div>
+      <div class="field-hint" style="margin-bottom:12px">Assine abaixo com o dedo (celular) ou mouse (computador). Sua assinatura tem validade jurídica.</div>
+
+      <div class="canvas-wrap">
+        <canvas id="sigCanvas"></canvas>
+        <div class="canvas-placeholder" id="canvasPlaceholder">Assine aqui</div>
+      </div>
+      <div class="canvas-actions">
+        <button class="btn-clear-sig" onclick="clearSignature()">Limpar assinatura</button>
+      </div>
+      <div class="sig-error" id="sig-error">Por favor, assine o documento.</div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep(2)">← Voltar</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- ETAPA 4: Confirmação -->
+    <div class="step" id="step3">
+      <div class="step-title">Confirmação</div>
+      <div class="step-desc">Revise os dados antes de enviar. Após o envio, a autorização ficará registrada.</div>
+
+      <div class="summary-box">
+        <div class="summary-section">Cliente</div>
+        <div class="summary-row"><span class="key">Nome</span><span class="val" id="sum-nome">—</span></div>
+        <div class="summary-row"><span class="key">CPF</span><span class="val" id="sum-cpf">—</span></div>
+        <div class="summary-row"><span class="key">RG</span><span class="val" id="sum-rg">—</span></div>
+        <div class="summary-row"><span class="key">Telefone</span><span class="val" id="sum-tel">—</span></div>
+        <div class="summary-row"><span class="key">E-mail</span><span class="val" id="sum-email">—</span></div>
+        <div class="summary-row"><span class="key">Endereço coleta</span><span class="val" id="sum-end">—</span></div>
+        <div class="summary-row"><span class="key">Ponto de referência</span><span class="val" id="sum-ref">—</span></div>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-section">Aparelho</div>
+        <div class="summary-row"><span class="key">Tipo</span><span class="val" id="sum-tipo">—</span></div>
+        <div class="summary-row"><span class="key">Marca / Modelo</span><span class="val" id="sum-marca">—</span></div>
+        <div class="summary-row"><span class="key">Série / IMEI</span><span class="val" id="sum-serial">—</span></div>
+        <div class="summary-row"><span class="key">Condição</span><span class="val" id="sum-cond">—</span></div>
+        <div class="summary-row"><span class="key">Problema</span><span class="val" id="sum-prob">—</span></div>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-section">Assinatura digital</div>
+        <div style="margin-top:8px"><img id="sum-sig" class="sig-preview" src="" alt="Assinatura" /></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep(3)">← Voltar e corrigir</button>
+        <button class="btn btn-primary" id="btnEnviar" onclick="submitForm()">✓ Enviar autorização</button>
+      </div>
+    </div>
+
+    <!-- SUCESSO -->
+    <div class="step" id="stepSuccess">
+      <div class="success-screen">
+        <div class="success-icon">
+          <svg viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="14" stroke="#4a9e6e" stroke-width="1.5"/>
+            <path d="M9 16.5l4.5 4.5 9-9" stroke="#4a9e6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="success-title">Autorização enviada!</div>
+        <div class="success-msg">Sua autorização de coleta e orçamento foi registrada com sucesso. O Dr. iPhone entrará em contato para agendar a coleta do aparelho.</div>
+        <div class="success-num" id="fin-protocolo"></div>
+        <div class="summary-box" id="fin-box" style="text-align:left; max-width:400px; margin:0 auto 28px;"></div>
+        <button class="btn btn-secondary" onclick="resetForm()" style="margin:0 auto">↩ Nova autorização</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentStep = 0;
+  const totalSteps = 4;
+  let sigData = null;
+  let isDrawing = false;
+  let lastX = 0, lastY = 0;
+
+  // ── Progresso ──────────────────────────────────────
+  function updateProgress() {
+    document.getElementById('progressFill').style.width = (currentStep / totalSteps * 100) + '%';
+    for (let i = 0; i < totalSteps; i++) {
+      const d = document.getElementById('dot' + i);
+      d.className = 'step-dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+    }
+  }
+  function showStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (n === 2) initCanvas();
+  }
+
+  // ── Máscaras ───────────────────────────────────────
+  function maskCPF(el) {
+    let v = el.value.replace(/\D/g,'').slice(0,11);
+    if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+    else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+    else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+    el.value = v;
+  }
+  function maskTel(el) {
+    let v = el.value.replace(/\D/g,'').slice(0,11);
+    if (v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+    else if (v.length > 6) v = v.replace(/(\d{2})(\d{4,5})(\d{0,4})/,'($1) $2-$3');
+    else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+    el.value = v;
+  }
+
+  // ── Validação ──────────────────────────────────────
+  function validateStep(n) {
+    if (n === 0) {
+      const nome  = document.getElementById('nome').value.trim();
+      const cpf   = document.getElementById('cpf').value.trim();
+      const rg    = document.getElementById('rg').value.trim();
+      const tel   = document.getElementById('telefone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const end   = document.getElementById('endereco').value.trim();
+      const cpfOk = cpf.replace(/\D/g,'').length === 11;
+      document.getElementById('field-nome').classList.toggle('has-error', nome.length < 3);
+      document.getElementById('field-cpf').classList.toggle('has-error', !cpfOk);
+      document.getElementById('field-rg').classList.toggle('has-error', rg.length < 4);
+      document.getElementById('field-telefone').classList.toggle('has-error', tel.length < 10);
+      document.getElementById('field-email').classList.toggle('has-error', !email.includes('@'));
+      document.getElementById('field-endereco').classList.toggle('has-error', end.length < 5);
+      return nome.length >= 3 && cpfOk && rg.length >= 4 && tel.length >= 10 && email.includes('@') && end.length >= 5;
+    }
+    if (n === 1) {
+      const tipo  = document.getElementById('tipo').value;
+      const marca = document.getElementById('marca').value.trim();
+      const prob  = document.getElementById('problema').value.trim();
+      const cond  = document.getElementById('condicao').value;
+      document.getElementById('field-tipo').classList.toggle('has-error', !tipo);
+      document.getElementById('field-marca').classList.toggle('has-error', marca.length < 2);
+      document.getElementById('field-problema').classList.toggle('has-error', prob.length < 5);
+      document.getElementById('field-condicao').classList.toggle('has-error', !cond);
+      return !!tipo && marca.length >= 2 && prob.length >= 5 && !!cond;
+    }
+    if (n === 2) {
+      const chkOk = document.getElementById('chk-termos').checked;
+      const sigOk = !!sigData;
+      document.getElementById('chk-termos-error').style.display = chkOk ? 'none' : 'block';
+      document.getElementById('sig-error').style.display = sigOk ? 'none' : 'block';
+      return chkOk && sigOk;
+    }
+    return true;
+  }
+
+  // ── Navegação ──────────────────────────────────────
+  function nextStep(n) {
+    if (!validateStep(n)) return;
+    currentStep = n + 1;
+    if (currentStep === 3) updateSummary();
+    showStep(currentStep);
+    updateProgress();
+  }
+  function prevStep(n) {
+    currentStep = n - 1;
+    showStep(currentStep);
+    updateProgress();
+  }
+
+  // ── Checkbox ───────────────────────────────────────
+  function toggleCheck(id) {
+    const chk = document.getElementById(id);
+    chk.checked = !chk.checked;
+    document.getElementById(id + '-wrap').classList.toggle('checked', chk.checked);
+    if (chk.checked) document.getElementById(id + '-error').style.display = 'none';
+  }
+
+  // ── Canvas / Assinatura ────────────────────────────
+  function initCanvas() {
+    const canvas = document.getElementById('sigCanvas');
+    const wrap = canvas.parentElement;
+    canvas.width = wrap.offsetWidth * window.devicePixelRatio;
+    canvas.height = 160 * window.devicePixelRatio;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.strokeStyle = '#c8a45a';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = (wrap.offsetWidth) / rect.width;
+      const scaleY = 160 / rect.height;
+      if (e.touches) {
+        return [(e.touches[0].clientX - rect.left) * scaleX, (e.touches[0].clientY - rect.top) * scaleY];
+      }
+      return [(e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY];
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      isDrawing = true;
+      [lastX, lastY] = getPos(e);
+      document.getElementById('canvasPlaceholder').style.opacity = '0';
+    }
+    function draw(e) {
+      if (!isDrawing) return;
+      e.preventDefault();
+      const [x, y] = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      [lastX, lastY] = [x, y];
+      sigData = canvas.toDataURL();
+      document.getElementById('sig-error').style.display = 'none';
+    }
+    function endDraw() { isDrawing = false; }
+
+    canvas.removeEventListener('mousedown', canvas._start);
+    canvas.removeEventListener('mousemove', canvas._draw);
+    canvas.removeEventListener('mouseup', canvas._end);
+    canvas.removeEventListener('touchstart', canvas._start);
+    canvas.removeEventListener('touchmove', canvas._draw);
+    canvas.removeEventListener('touchend', canvas._end);
+    canvas._start = startDraw; canvas._draw = draw; canvas._end = endDraw;
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
+  }
+
+  function clearSignature() {
+    const canvas = document.getElementById('sigCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sigData = null;
+    document.getElementById('canvasPlaceholder').style.opacity = '1';
+  }
+
+  // ── Resumo ─────────────────────────────────────────
+  function updateSummary() {
+    document.getElementById('sum-nome').textContent  = document.getElementById('nome').value.trim();
+    document.getElementById('sum-cpf').textContent   = document.getElementById('cpf').value.trim();
+    document.getElementById('sum-rg').textContent    = document.getElementById('rg').value.trim();
+    document.getElementById('sum-tel').textContent   = document.getElementById('telefone').value.trim();
+    document.getElementById('sum-email').textContent = document.getElementById('email').value.trim();
+    document.getElementById('sum-end').textContent   = document.getElementById('endereco').value.trim();
+    document.getElementById('sum-ref').textContent   = document.getElementById('referencia').value.trim() || '—';
+    document.getElementById('sum-tipo').textContent  = document.getElementById('tipo').value;
+    document.getElementById('sum-marca').textContent = document.getElementById('marca').value.trim();
+    document.getElementById('sum-serial').textContent= document.getElementById('serial').value.trim() || '—';
+    document.getElementById('sum-cond').textContent  = document.getElementById('condicao').value;
+    document.getElementById('sum-prob').textContent  = document.getElementById('problema').value.trim();
+    if (sigData) document.getElementById('sum-sig').src = sigData;
+  }
+
+  // ── Número de protocolo ────────────────────────────
+  function gerarProtocolo() {
+    const agora = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    return `DR${agora.getFullYear()}${pad(agora.getMonth()+1)}${pad(agora.getDate())}${pad(agora.getHours())}${pad(agora.getMinutes())}${Math.floor(Math.random()*900+100)}`;
+  }
+
+  // ── Envio ──────────────────────────────────────────
+  async function submitForm() {
+    const btn = document.getElementById('btnEnviar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Enviando...';
+
+    const protocolo = gerarProtocolo();
+    const agora = new Date().toLocaleString('pt-BR');
+
+    const nome    = document.getElementById('nome').value.trim();
+    const cpf     = document.getElementById('cpf').value.trim();
+    const rg      = document.getElementById('rg').value.trim();
+    const tel     = document.getElementById('telefone').value.trim();
+    const email   = document.getElementById('email').value.trim();
+    const end     = document.getElementById('endereco').value.trim();
+    const tipo    = document.getElementById('tipo').value;
+    const marca   = document.getElementById('marca').value.trim();
+    const serial  = document.getElementById('serial').value.trim() || '—';
+    const cond    = document.getElementById('condicao').value;
+    const prob    = document.getElementById('problema').value.trim();
+
+    const payload = {
+      'Protocolo':           protocolo,
+      'Data / Hora':         agora,
+      'Nome completo':       nome,
+      'CPF':                 cpf,
+      'RG':                  rg,
+      'Telefone':            tel,
+      'E-mail':              email,
+      'Endereço de coleta':  end,
+      'Tipo de aparelho':    tipo,
+      'Marca / Modelo':      marca,
+      'Série / IMEI':        serial,
+      'Condição estética':   cond,
+      'Problema relatado':   prob,
+      'Ponto de referência':  document.getElementById('referencia').value.trim() || '—',
+      'Assinatura digital':  '(arquivo gerado no formulário)',
+      '_subject': `📋 Nova autorização de coleta – ${nome} | ${protocolo}`
+    };
+
+    const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwUMRvebsgAEE2B6A8CPI8zl_g95Mw0lkTKPLynSWfSlM7oZHeV9Vg2jIzgcY3k9pUj/exec';
+
+    try {
+      fetch(SHEETS_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const res = await fetch('https://formspree.io/f/mbdqodwn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Erro');
+
+      document.getElementById('fin-protocolo').textContent = 'Protocolo: ' + protocolo;
+      document.getElementById('fin-box').innerHTML = `
+        <div class="summary-section">Resumo</div>
+        <div class="summary-row"><span class="key">Cliente</span><span class="val">${nome}</span></div>
+        <div class="summary-row"><span class="key">Aparelho</span><span class="val">${marca}</span></div>
+        <div class="summary-row"><span class="key">Data</span><span class="val">${agora}</span></div>
+      `;
+
+      document.querySelector('.step-indicator').style.display = 'none';
+      document.getElementById('progressFill').style.width = '100%';
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('stepSuccess').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = '✓ Enviar autorização';
+      alert('Não foi possível enviar. Verifique sua conexão e tente novamente.');
+    }
+  }
+
+  // ── Reset ──────────────────────────────────────────
+  function resetForm() {
+    ['nome','cpf','rg','telefone','email','endereco','referencia','marca','serial','problema'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('tipo').value = '';
+    document.getElementById('condicao').value = '';
+    const chk = document.getElementById('chk-termos');
+    chk.checked = false;
+    document.getElementById('chk-termos-wrap').classList.remove('checked');
+    sigData = null;
+    document.querySelectorAll('.field').forEach(f => f.classList.remove('has-error'));
+    document.querySelector('.step-indicator').style.display = 'flex';
+    const btn = document.getElementById('btnEnviar');
+    btn.disabled = false; btn.innerHTML = '✓ Enviar autorização';
+    currentStep = 0; showStep(0); updateProgress();
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
